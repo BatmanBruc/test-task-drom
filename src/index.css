@@ -1,0 +1,115 @@
+.select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select, .input {
+  width: 100%;
+}
+
+.input {
+  box-sizing: border-box;
+}
+
+.field {
+  width: 100%;
+  position: relative;
+}
+
+.field__item {
+  padding: 15px;
+  border: 0px;
+  font-size: 16px;
+  border-radius: 4px;
+  background: #efefef;
+
+}
+
+.field-error {
+  color: #F44336;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.field--error .field__item {
+  color: #F44336;
+  background: #ffd3d3;
+}
+
+.button {
+  width: 150px;
+  margin: auto;
+  border: 10px;
+  font-size: 16px;
+  padding: 20px;
+  border-radius: 30px;
+  background: #db001b;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.button:disabled {
+  background: #bbbbbb;;
+}
+
+.field-select__icon {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: 16px;
+  height: 16px;
+}
+
+.field-select__icon img {
+  width: 100%;
+}
+
+.block-date-time__fields {
+  display: flex;
+  gap: 20px;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+html {
+  height: 100%;
+  font-family: sans-serif;
+}
+
+body {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.form-order {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 450px;
+  height: 100%;
+}
+
+.form-order form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.city-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 25px;
+}
+
+.city-info__item {
+  line-height: 18px;
+  font-size: 14px;
+}
