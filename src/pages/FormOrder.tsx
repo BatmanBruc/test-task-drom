@@ -1,43 +1,43 @@
 import { useEffect, useMemo, useState } from 'react';
-import Form from '@/components/Form';
-import Input from '@/components/Input';
-import InputPhone from '@/components/InputPhone';
-import Button from '@/components/Button';
-import Select from '@/components/Select';
+import toast, { Toaster } from 'react-hot-toast';
+import Form from '@/components/base/Form';
+import Input from '@/components/base/Input';
+import InputPhone from '@/components/base/InputPhone';
+import Button from '@/components/base/Button';
+import Select from '@/components/base/Select';
+import CityInfo from '@/components/CityInfo';
+
 import { getCities, getInfoByCity, setOrder } from '@/api';
 import { defaultCityId } from '@/config';
 
 import { OptionObject } from '@/components/types';
 import { City, CityDaysStructur, CityDate, CityDateStructur } from '@/types';
+import { formatDate } from '@/helpers';
 
 export default function FormOrder() {
 
-  const [selectCityList, setSelectCityList] = useState<OptionObject[]>()
-  const [selectDayList, setSelectDayList] = useState<string[]>();
-  const [selectDateTimeList, setSelectDateTimeList] = useState<OptionObject[]>()
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [city, setCity] = useState<City>();
-  const [date, setDate] = useState<CityDate>();
-  const [phone, setPhone] = useState<string>();
-  const [name, setName] = useState<string>();
+  const [selectCityList, setSelectCityList] = useState<OptionObject[]>();
+  const [selectDayList, setSelectDayList] = useState<OptionObject[]>();
+  const [selectDateTimeList, setSelectDateTimeList] = useState<OptionObject[]>();
 
-  const formatPrice = (price: number) => {
-    return price.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 })
-  }
-
-  const formatPhone = (phone: string) => {
-    return phone.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/g, `+7 ($1) $2 $3 $4`)
-  }
+  const [city, setCity] = useState<City | null>();
+  const [day, setDay] = useState<string >('');
+  const [date, setDate] = useState<CityDate | null>();
+  const [phone, setPhone] = useState<string>('');
+  const [name, setName] = useState<string>('');
 
   const [citiesStructur, setCitiesStructur] = useState<{
     [id: string]: City
-  }>({})
-  const [daysStructur, setDaysStructur] = useState<CityDaysStructur>({})
+  }>({});
+  const [daysStructur, setDaysStructur] = useState<CityDaysStructur>({});
   const [datesStructur, setDatesStructur] = useState<{
     [datetime: string]: CityDate 
-  }>({})
+  }>({});
 
   const requestGetCities = async () => {
+    setLoading(true);
     const cities = await getCities();
     const struct: {
       [id: string]: City
@@ -52,113 +52,133 @@ export default function FormOrder() {
     setCitiesStructur(struct);
     setCity(struct[defaultCityId]);
     requestGetInfoByCity(defaultCityId);
+    setLoading(false);
   }
 
   const requestGetInfoByCity = async (cityId: string) => {
     const result = await getInfoByCity(cityId);
-    setDaysStructur(result)
-    setSelectDayList(Object.keys(result))
-  }
+    setDaysStructur(result);
+
+    const selectTitels = Object.keys(result).map((key) => {
+      return {
+        title: formatDate(key),
+        value: key
+      }
+    })
+    setSelectDayList(selectTitels);
+  };
 
   const selectCity = (cityId: string) => {
+    setDay('');
+    setDate(null);
     setCity(citiesStructur[cityId]);
-    requestGetInfoByCity(cityId)
-  }
+    requestGetInfoByCity(cityId);
+  };
 
-  const selectDate = (dateKey: string) => {
-    const date = daysStructur[dateKey];
-    setDatesStructur(date)
-    const struct: CityDateStructur = {}
+  const selectDay = (dateKey: string) => {
+    setDay(dateKey);
+    setSelectDateTimeList([]);
+    const day = daysStructur[dateKey];
+    const struct: CityDateStructur = {};
     const selectTitels = [];
-    for(const key in date) {
-      struct[key] = date[key]
-      selectTitels.push({
-        title: `${date[key].begin} - ${date[key].end}`,
-        value: date[key].date
-      })
+    for(const key in day) {
+      if (!day[key].isBooked){
+        struct[key] = day[key];
+        selectTitels.push({
+          title: `${day[key].begin} - ${day[key].end}`,
+          value: day[key].date
+        });
+      }
     }
-    setSelectDateTimeList(selectTitels)
+    setDatesStructur(struct);
+    setSelectDateTimeList(selectTitels);
   }
 
   const selectTime = (value: string) => {
-    console.log(datesStructur[value]);
-    setDate(datesStructur[value])
-  }
+    setDate(datesStructur[value]);
+  };
 
   const sendForm = () => {
-    setOrder({
-      city,
-      date,
-      phone,
-      name
-    })
-  }
+    if (city && date && phone && name){
+      setLoading(true);
+      setOrder({
+        city,
+        date,
+        phone,
+        name
+      });
+      setTimeout(() => {
+        setCity(null);
+        setDay('');
+        setDate(null);
+        setPhone('');
+        setName('');
+        setLoading(false);
+        toast.success('Запись успешно прошла!')
+      }, 1000);
+    }
+  };
 
   const [isError, setError] = useState<boolean>(false);
 
   const isValidForm = useMemo(() => {
-    console.log(!isError
-      && !!date
-      && !!phone
-      && !!name)
     return !isError
       && !!date
       && !!phone
       && !!name
-  }, [isError, date, phone, name])
+  }, [isError, date, phone, name]);
 
   const handlerInvalidInput = (error: string) => {
     setError(!!error);
-  }
+  };
 
   const [errorSelectTime, setErrorSelectTime] = useState<string>('');
   const handlerInvalidSelectTime = (error: string) => {
-    console.log(error)
     setError(!!error);
-    setErrorSelectTime(error)
-  }
+    setErrorSelectTime(error);
+  };
 
   useEffect(() => {
     requestGetCities();
-  }, [])
+  }, []);
 
   return (
     <>
       <div className="form-order">
-        <div className="logo"><img src="/logo.svg"/></div>
+        { loading && <div className="loading-cover"></div>}
+        <div className="logo">
+          { loading && <img className="logo-spinner" src="/spinner.svg"/> }
+          <img src="/logo.svg"/>
+        </div>
         <h2 style={{marginBottom: '40px'}}>Онлайн запись</h2>
         <Form onSubmit={sendForm}>
           <Select
             name="city"
+            placeholder="Город"
             list={selectCityList}
             onChange={selectCity}
-            defaultValue={defaultCityId}
+            value={city?.id || ''}
           />
-          <div className="city-info">
-            <div className="city-info__item">{ city?.address }</div>
-            <div className="city-info__item" style={{ display: 'flex', gap: '5px' }}>{
-              city?.phones.map(phone => (
-                <a 
-                  key={phone}
-                  href={'tel:+' + phone}
-                  style={{ textDecoration: 'none' }}
-                >
-                  { formatPhone(phone) }
-                </a>
-              )) 
-            }</div>
-            <div className="city-info__item">Стоимость услуги { city?.price && formatPrice(city?.price)}</div>
-          </div>
+          { !!city && 
+            <CityInfo
+              address={city.address}
+              phones={city.phones}
+              price={city.price}
+            />
+          }
           <div className="block-date-time">
             <div className="block-date-time__fields">
               <Select
-                name="date"
+                name="day"
+                value={day}
                 list={selectDayList} 
-                onChange={selectDate}
+                onChange={selectDay}
                 placeholder="Дата"
               />
               <Select
-                name="datetime"
+                name="date"
+                disabled={!day || !selectDateTimeList?.length}
+                value={date?.date || ''}
                 list={selectDateTimeList} 
                 onChange={selectTime}
                 required
@@ -172,6 +192,7 @@ export default function FormOrder() {
           </div>
           <InputPhone
             name="phone"
+            value={phone}
             onChange={setPhone}
             required
             requiredErrorMessage="Пожалуйста, укажите телефон, иначе наши специалисты не смогу связаться с вами"
@@ -182,6 +203,7 @@ export default function FormOrder() {
           />
           <Input
             name="name"
+            value={name}
             onChange={setName}
             required
             requiredErrorMessage="Пожалуйста, укажите имя"
@@ -189,11 +211,12 @@ export default function FormOrder() {
             placeholder="Имя"
           />
           <Button
-            title="Записаться"
+            title="Записаться" 
             disabled={!isValidForm}
           />
         </Form>
+        <Toaster/>
       </div>
     </>
-  )
-}
+  );
+};

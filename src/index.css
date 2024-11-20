@@ -1,3 +1,20 @@
+#root {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+html {
+  height: 100%;
+  font-family: sans-serif;
+}
+
+body {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .select {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -5,8 +22,16 @@
   cursor: pointer;
 }
 
+.select::-ms-value {
+  background: none;
+}
+
 .select, .input {
   width: 100%;
+}
+
+.select--empty {
+  color: #737373;
 }
 
 .input {
@@ -48,6 +73,7 @@
   background: #db001b;
   color: #ffffff;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .button:disabled {
@@ -71,29 +97,18 @@
   gap: 20px;
 }
 
-#root {
-  display: flex;
-  justify-content: center;
-  height: 100%;
-}
-
-html {
-  height: 100%;
-  font-family: sans-serif;
-}
-
-body {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-}
-
 .form-order {
   display: flex;
   justify-content: center;
   flex-direction: column;
   width: 450px;
   height: 100%;
+}
+
+.form-order__success {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #249f29;
 }
 
 .form-order form {
@@ -112,4 +127,52 @@ body {
 .city-info__item {
   line-height: 18px;
   font-size: 14px;
+}
+
+.loading-cover {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #ffffff7a;
+  z-index: 1;
+  left: 0px;
+}
+
+.logo {
+  position: relative;
+}
+
+.logo-spinner {
+  position: absolute;
+  background: white;
+  width: 41px;
+}
+
+.date-format {
+  text-transform: capitalize;
+}
+
+.order-list {
+	width: 100%;
+	margin-bottom: 20px;
+	border-collapse: collapse; 
+}
+.order-list th {
+	font-weight: bold;
+	padding: 5px;
+	background: #efefef;
+}
+.order-list td {
+	padding: 20px;
+}
+.order-list tr td:first-child, .order-list tr th:first-child {
+	border-left: none;
+}
+.order-list tr td:last-child, .order-list tr th:last-child {
+	border-right: none;
+}
+
+.order-list__remove {
+  cursor: pointer;
+  color: red;
 }

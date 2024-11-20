@@ -1,10 +1,10 @@
 import InputMask from 'react-input-mask';
-import { InputProps } from "./types";
-import useValidate from "./useValidate";
+import { InputProps } from "../types";
+import useValidate from "../hooks/useValidate";
 
 export default function InputPhone({
   name,
-  defaultValue,
+  value,
   pattern,
   required = false,
   requiredErrorMessage,
@@ -17,7 +17,7 @@ export default function InputPhone({
   const handlerOnChange = (e: any) => {
     const newValue = e.target.value;
     if (onChange) onChange(newValue.replace(/[^0-9]/g, ''));
-  }
+  };
 
   const [error, validate, handlerOnFocus] = useValidate({
     required,
@@ -25,11 +25,11 @@ export default function InputPhone({
     pattern,
     validateErrorMessage,
     onInvalid
-  })
+  });
 
   const handlerOnBlur = (e: any) => {
-    validate(e.target.value.replace(/[^0-9]/g, ''))
-  }
+    validate(e.target.value.replace(/[^0-9]/g, ''));
+  };
 
   return (
     <>
@@ -39,7 +39,7 @@ export default function InputPhone({
           name={name}
           maskChar=" "
           mask="+7\(999)999-99-99"
-          defaultValue={defaultValue}
+          value={value}
           onChange={handlerOnChange}
           onBlur={handlerOnBlur}
           onFocus={handlerOnFocus}
@@ -49,5 +49,5 @@ export default function InputPhone({
         { error && (<div className="field-error">{ error }</div>) }
       </div>
     </>
-  )
-}
+  );
+};

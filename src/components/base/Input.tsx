@@ -1,9 +1,9 @@
-import { InputProps } from "./types";
-import useValidate from "./useValidate";
+import { InputProps } from "../types";
+import useValidate from "../hooks/useValidate";
 
 export default function Input({
   name,
-  defaultValue,
+  value,
   pattern,
   required = false,
   requiredErrorMessage,
@@ -16,7 +16,7 @@ export default function Input({
   const handlerOnChange = (e: any) => {
     const newValue = e.target.value;
     if (onChange) onChange(newValue);
-  }
+  };
 
   const [error, validate, handlerOnFocus] = useValidate({
     required,
@@ -24,11 +24,11 @@ export default function Input({
     pattern,
     validateErrorMessage,
     onInvalid
-  })
+  });
 
   const handlerOnBlur = (e: any) => {
-    validate(e.target.value)
-  }
+    validate(e.target.value);
+  };
 
   return (
     <>
@@ -37,7 +37,7 @@ export default function Input({
           className="input field__item"
           type="text"
           name={name}
-          defaultValue={defaultValue}
+          value={value}
           onChange={handlerOnChange}
           onBlur={handlerOnBlur}
           onInvalid={handlerOnBlur}

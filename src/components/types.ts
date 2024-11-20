@@ -3,6 +3,8 @@ export type FieldProps = {
   defaultValue?: string
   name?: string
   placeholder?: string
+  value?: string
+  disabled?: boolean
 };
 
 export type FieldValidateProps = {
